@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mastering Linear Regression - Theoretical & Practical Guide</title>
+
+  <!-- MathJax for High-Contrast LaTeX Formulas -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Chart.js for Interactive Loss & R2 Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #0b0f19;
+      --card-bg: #151d30;
+      --accent-blue: #38bdf8;
+      --accent-pink: #f472b6;
+      --accent-green: #4ade80;
+      --accent-yellow: #fde047;
+      --accent-purple: #c084fc;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --formula-bg: #050811;
+      --code-bg: #030712;
+      --border-color: #2a364f;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.7;
+      margin: 0;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.6rem;
+      color: var(--accent-blue);
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 1.15rem;
+      margin-bottom: 40px;
+    }
+
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 35px;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    h2 {
+      color: var(--accent-pink);
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 8px;
+      margin-top: 0;
+      font-size: 1.6rem;
+    }
+
+    h3 {
+      color: var(--accent-yellow);
+      margin-top: 25px;
+      font-size: 1.25rem;
+    }
+
+    .easy-concept {
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--accent-blue);
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin: 15px 0;
+    }
+
+    .easy-concept strong {
+      color: var(--accent-blue);
+    }
+
+    /* High-contrast Formula Display Boxes */
+    .formula-box {
+      background-color: var(--formula-bg);
+      border: 1px solid var(--border-color);
+      border-left: 5px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 18px;
+      margin: 18px 0;
+      text-align: center;
+      font-size: 1.35rem;
+      color: #ffffff;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
+      overflow-x: auto;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      padding: 18px;
+      border-radius: 8px;
+    }
+
+    .info-card h4 {
+      margin-top: 0;
+      color: var(--accent-yellow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border-color);
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #0b0f19;
+      color: var(--accent-green);
+    }
+
+    .chart-container {
+      position: relative;
+      background: #080c16;
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      margin-top: 20px;
+    }
+
+    code, pre {
+      font-family: 'Fira Code', 'Consolas', monospace;
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--accent-purple);
+      border-radius: 8px;
+      padding: 20px;
+      color: #e2e8f0;
+      overflow-x: auto;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .highlight {
+      color: var(--accent-blue);
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Linear Regression: Complete Master Reference</h1>
+  <div class="subtitle">Intuitive Theory, Mathematical Steps, Visual Landscapes & Code Implementation</div>
+
+  <!-- 1. Types of Linear Regression -->
+  <div class="section-card">
+    <h2>1. Types of Linear Regression</h2>
+    <div class="easy-concept">
+      <strong>Simple Idea:</strong> Linear regression predicts an outcome variable (\(y\)) by fitting a straight line (or plane) through your data points.
+    </div>
+
+    <div class="grid-2col">
+      <div class="info-card">
+        <h4>1. Simple Linear Regression</h4>
+        <p>Uses <strong>one single input feature</strong> (\(x\)) to predict the target variable (\(y\)).</p>
+        <p><em>Example:</em> Predicting salary based only on years of experience.</p>
+        <div class="formula-box" style="font-size: 1.1rem;">$$\hat{y} = \beta_0 + \beta_1 x$$</div>
+      </div>
+
+      <div class="info-card">
+        <h4>2. Multiple Linear Regression</h4>
+        <p>Uses <strong>two or more input features</strong> (\(x_1, x_2, \dots, x_p\)) to predict the target (\(y\)).</p>
+        <p><em>Example:</em> Predicting house price based on area, number of bedrooms, and location score.</p>
+        <div class="formula-box" style="font-size: 1.1rem;">$$\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_p x_p$$</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Significance of Slope and Intercept -->
+  <div class="section-card">
+    <h2>2. Why Slope (\(\beta_1\)) and Intercept (\(\beta_0\)) Matter</h2>
+    
+    <div class="formula-box">
+      $$\hat{y} = \underbrace{\beta_0}_{\text{Starting Value}} + \underbrace{\beta_1}_{\text{Rate of Change}} \cdot x$$
+    </div>
+
+    <div class="grid-2col">
+      <div class="info-card">
+        <h4>Y-Intercept (\(\beta_0\))</h4>
+        <p><strong>What it is:</strong> The baseline value of \(\hat{y}\) when the input \(x = 0\).</p>
+        <p><strong>Real-World Meaning:</strong> If experience \(x = 0\), \(\beta_0\) represents the starting base salary for a fresh graduate.</p>
+      </div>
+
+      <div class="info-card">
+        <h4>Slope Coefficient (\(\beta_1\))</h4>
+        <p><strong>What it is:</strong> How much \(\hat{y}\) changes for every 1-unit increase in \(x\).</p>
+        <p><strong>Real-World Meaning:</strong> If \(\beta_1 = 5000\), it means every additional year of experience adds $5,000 to the salary.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. OLS Method — Detailed Theory With Equations -->
+  <div class="section-card">
+    <h2>3. OLS Method — Detailed Theory With Equations</h2>
+    
+    <p>OLS (Ordinary Least Squares) is the mathematical method used in linear regression to find the line that best represents the relationship between \(X\) and \(Y\).</p>
+
+    <h3>1. Regression equation</h3>
+    <p>For simple linear regression:</p>
+    <div class="formula-box">
+      $$\hat{Y} = b_0 + b_1 X$$
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li>\(\hat{Y}\) = predicted value of \(Y\)</li>
+      <li>\(b_0\) = intercept</li>
+      <li>\(b_1\) = slope</li>
+      <li>\(X\) = input/independent variable</li>
+    </ul>
+    <p><strong>Example:</strong></p>
+    <div class="formula-box">
+      $$\hat{Y} = 2 + 3X$$
+    </div>
+    <p>If \(X = 4\):</p>
+    <div class="formula-box">
+      $$\hat{Y} = 2 + 3(4) = 14$$
+    </div>
+    <p>So predicted \(Y = 14\).</p>
+
+    <h3>2. Actual value vs predicted value</h3>
+    <p>Suppose actual value is \(Y = 16\) and predicted value is \(\hat{Y} = 14\).</p>
+    <p>Then the residual/error is:</p>
+    <div class="formula-box">
+      $$e = Y - \hat{Y}$$
+    </div>
+    <div class="formula-box">
+      $$e = 16 - 14 = 2$$
+    </div>
+    <p>So: <strong>Residual = Actual − Predicted</strong></p>
+
+    <h3>3. Why do we square the error?</h3>
+    <p>Some errors can be positive and some negative. For example: \(e_1 = 2\) and \(e_2 = -2\).</p>
+    <p>If we simply add them: \(2 + (-2) = 0\). It looks like there is no error, which is wrong.</p>
+    <p>So OLS squares the errors: \(2^2 + (-2)^2 = 4 + 4 = 8\).</p>
+    <p>Therefore, OLS uses:</p>
+    <div class="formula-box">
+      $$SSE = \sum (Y - \hat{Y})^2$$
+    </div>
+    <p>where \(SSE\) = Sum of Squared Errors.</p>
+
+    <h3>4. Main objective of OLS</h3>
+    <p>The main objective is:</p>
+    <div class="formula-box">
+      $$\mathbf{\text{Minimize } \sum (Y - \hat{Y})^2}$$
+    </div>
+    <p>In simple words: OLS searches for the line where the total squared error is minimum. That's why it is called Least Squares.</p>
+
+    <h3>5. How do we find the slope (\(b_1\))?</h3>
+    <p>The OLS slope formula is:</p>
+    <div class="formula-box">
+      $$\mathbf{b_1 = \frac{\sum (X - \bar{X})(Y - \bar{Y})}{\sum (X - \bar{X})^2}}$$
+    </div>
+    <p>Where: \(X\) = each \(X\) value, \(Y\) = each \(Y\) value, \(\bar{X}\) = mean of \(X\), \(\bar{Y}\) = mean of \(Y\).</p>
+    <p><strong>Meaning of the formula:</strong></p>
+    <p>The numerator \(\sum (X - \bar{X})(Y - \bar{Y})\) tells us how \(X\) and \(Y\) move together.</p>
+    <p>The denominator \(\sum (X - \bar{X})^2\) measures the variation in \(X\).</p>
+    <div class="formula-box" style="font-size: 1.1rem;">
+      $$\text{Slope} = \frac{\text{how } X \text{ and } Y \text{ move together}}{\text{variation in } X}$$
+    </div>
+
+    <h3>6. How do we find the intercept (\(b_0\))?</h3>
+    <p>After finding the slope, use:</p>
+    <div class="formula-box">
+      $$\mathbf{b_0 = \bar{Y} - b_1 \bar{X}}$$
+    </div>
+    <p>So the order is:</p>
+    <div class="formula-box" style="font-size: 1.1rem;">
+      $$\text{Find } \bar{X} \rightarrow \text{Find } \bar{Y} \rightarrow \text{Find } b_1 \text{ (slope)} \rightarrow \text{Find } b_0 \text{ (intercept)} \rightarrow \text{Create regression equation}$$
+    </div>
+
+    <h3>7. Complete example</h3>
+    <p>Take dataset:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>X</th>
+          <th>1</th>
+          <th>2</th>
+          <th>3</th>
+          <th>4</th>
+          <th>5</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Y</strong></td>
+          <td>2</td>
+          <td>4</td>
+          <td>5</td>
+          <td>4</td>
+          <td>5</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p><strong>Step 1: Find means</strong></p>
+    <div class="formula-box" style="font-size: 1.1rem;">
+      $$\bar{X} = \frac{1+2+3+4+5}{5} = 3, \quad \bar{Y} = \frac{2+4+5+4+5}{5} = 4$$
+    </div>
+
+    <p><strong>Step 2: Calculate slope</strong></p>
+    <p>For this data, \(\sum (X - \bar{X})(Y - \bar{Y}) = 6\) and \(\sum (X - \bar{X})^2 = 10\).</p>
+    <div class="formula-box">
+      $$b_1 = \frac{6}{10} = 0.6$$
+    </div>
+
+    <p><strong>Step 3: Calculate intercept</strong></p>
+    <div class="formula-box">
+      $$b_0 = 4 - (0.6)(3) = 2.2$$
+    </div>
+
+    <p><strong>Step 4: Regression equation</strong></p>
+    <div class="formula-box">
+      $$\mathbf{\hat{Y} = 2.2 + 0.6X}$$
+    </div>
+
+    <h3>8. Predict a value</h3>
+    <p>For \(X = 6\):</p>
+    <div class="formula-box">
+      $$\hat{Y} = 2.2 + 0.6(6) = \mathbf{5.8}$$
+    </div>
+
+    <h3>9. Calculate residual</h3>
+    <p>If the actual \(Y\) for \(X = 6\) is \(7\):</p>
+    <div class="formula-box">
+      $$e = Y - \hat{Y} = 7 - 5.8 = 1.2$$
+    </div>
+    <p>Squared error:</p>
+    <div class="formula-box">
+      $$e^2 = (1.2)^2 = 1.44$$
+    </div>
+    <p>OLS does this for every observation and adds all the squared errors: \(SSE = e_1^2 + e_2^2 + e_3^2 + \dots + e_n^2\). The best regression line is the one that gives the minimum \(SSE\).</p>
+
+    <h3>10. The whole OLS concept in one flow</h3>
+    <div class="formula-box" style="font-size: 1.1rem;">
+      $$\mathbf{\text{Data} \rightarrow \bar{X}, \bar{Y} \rightarrow b_1 \rightarrow b_0 \rightarrow \hat{Y} \rightarrow e = Y - \hat{Y} \rightarrow SSE = \sum e^2}$$
+    </div>
+
+    <h3>Most important equations to remember</h3>
+    <ul>
+      <li><strong>Regression equation:</strong> \(\hat{Y} = b_0 + b_1 X\)</li>
+      <li><strong>Slope:</strong> \(b_1 = \frac{\sum(X - \bar{X})(Y - \bar{Y})}{\sum(X - \bar{X})^2}\)</li>
+      <li><strong>Intercept:</strong> \(b_0 = \bar{Y} - b_1 \bar{X}\)</li>
+      <li><strong>Residual:</strong> \(e = Y - \hat{Y}\)</li>
+      <li><strong>Sum of Squared Errors:</strong> \(SSE = \sum(Y - \hat{Y})^2\)</li>
+      <li><strong>OLS objective:</strong> \(\min SSE\)</li>
+    </ul>
+    <p><em>In one sentence: OLS finds \(b_0\) and \(b_1\) such that the sum of squared differences between actual \(Y\) and predicted \(Y\) is as small as possible.</em></p>
+  </div>
+
+  <!-- 4. Optimization via Gradient Descent -->
+  <div class="section-card">
+    <h2>4. Optimization via Gradient Descent</h2>
+    <div class="easy-concept">
+      <strong>Simple Idea:</strong> Instead of calculating parameters instantly using calculus, start with initial parameter values, evaluate your error, and take small steps downhill until you reach the lowest error.
+    </div>
+
+    <h3>1. Initialize Parameters</h3>
+    <p>Start with initial values for slope (\(m\)) and intercept (\(b\)).</p>
+
+    <h3>2. Calculate the Cost Function</h3>
+    <p>Measure the error using the <strong>Mean Squared Error (MSE)</strong>:</p>
+    <div class="formula-box">
+      $$J(m,b) = \frac{1}{n} \sum_{i=1}^{n} (y_i - (m x_i + b))^2$$
+    </div>
+
+    <h3>3. Compute the Gradient</h3>
+    <p>Calculate how much the cost function changes with respect to \(m\) and \(b\):</p>
+    <div class="grid-2col">
+      <div class="info-card">
+        <h4>For slope \(m\):</h4>
+        <div class="formula-box" style="font-size:1.05rem;">
+          $$\frac{\partial J}{\partial m} = -\frac{2}{n} \sum_{i=1}^{n} x_i (y_i - (m x_i + b))$$
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h4>For intercept \(b\):</h4>
+        <div class="formula-box" style="font-size:1.05rem;">
+          $$\frac{\partial J}{\partial b} = -\frac{2}{n} \sum_{i=1}^{n} (y_i - (m x_i + b))$$
+        </div>
+      </div>
+    </div>
+
+    <h3>4. Update Parameters</h3>
+    <p>Change \(m\) and \(b\) to reduce the error:</p>
+    <div class="grid-2col">
+      <div class="info-card">
+        <h4>For slope \(m\):</h4>
+        <div class="formula-box" style="font-size:1.05rem;">
+          $$m = m - \alpha \cdot \frac{\partial J}{\partial m}$$
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h4>For intercept \(b\):</h4>
+        <div class="formula-box" style="font-size:1.05rem;">
+          $$b = b - \alpha \cdot \frac{\partial J}{\partial b}$$
+        </div>
+      </div>
+    </div>
+    <p>Here \(\alpha\) is the learning rate that controls the size of each update.</p>
+
+    <h3>5. Repeat</h3>
+    <p>Keep repeating steps 2–4 until the error stops decreasing significantly.</p>
+
+    <h3>3D Gradient Descent Cost Surface</h3>
+    <div class="chart-container" style="text-align: center;">
+      <canvas id="canvas3d" width="700" height="320"></canvas>
+      <p style="color:var(--text-sub); font-size:0.85rem;">Convex 3D bowl showing parameters descending to global minimum loss.</p>
+    </div>
+  </div>
+
+  <!-- 5. Evaluation Metrics (MAE, MSE, RMSE) -->
+  <div class="section-card">
+    <h2>5. Loss Evaluation Metrics: MAE, MSE, and RMSE</h2>
+    
+    <div class="grid-2col">
+      <div>
+        <p><strong>Mean Absolute Error (MAE):</strong> Average absolute difference.</p>
+        <div class="formula-box" style="font-size: 1.05rem;">$$\text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|$$</div>
+
+        <p><strong>Mean Squared Error (MSE):</strong> Average squared difference.</p>
+        <div class="formula-box" style="font-size: 1.05rem;">$$\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$</div>
+
+        <p><strong>Root Mean Squared Error (RMSE):</strong> Square root of MSE.</p>
+        <div class="formula-box" style="font-size: 1.05rem;">$$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}$$</div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="lossChart"></canvas>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Advantages</th>
+          <th>Disadvantages</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>MAE</strong></td>
+          <td>Easy to interpret; robust against severe outliers.</td>
+          <td>Gradient is non-differentiable at 0 error; doesn't heavily penalize large errors.</td>
+        </tr>
+        <tr>
+          <td><strong>MSE</strong></td>
+          <td>Fully differentiable; heavily penalizes large errors.</td>
+          <td>Units are squared (\(y^2\)), making direct interpretation difficult.</td>
+        </tr>
+        <tr>
+          <td><strong>RMSE</strong></td>
+          <td>Expressed in original target units (\(y\)); differentiable.</td>
+          <td>Sensitive to severe outliers compared to MAE.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 6. Goodness of Fit: R2 and Adjusted R2 -->
+  <div class="section-card">
+    <h2>6. Goodness of Fit: \(R^2\) and Adjusted \(R^2\)</h2>
+
+    <div class="grid-2col">
+      <div class="info-card">
+        <h4>\(R^2\) Score (Coefficient of Determination)</h4>
+        <div class="formula-box" style="font-size: 1.05rem;">
+          $$R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}} = 1 - \frac{\sum (y_i - \hat{y}_i)^2}{\sum (y_i - \bar{y})^2}$$
+        </div>
+        <p><strong>Meaning:</strong> Proportion of variance in target variable explained by the model.</p>
+      </div>
+
+      <div class="info-card">
+        <h4>Adjusted \(R^2\) Score</h4>
+        <div class="formula-box" style="font-size: 1.05rem;">
+          $$\text{Adjusted } R^2 = 1 - \left[ \frac{(1 - R^2)(n - 1)}{n - p - 1} \right]$$
+        </div>
+        <p><strong>Meaning:</strong> Penalizes model complexity (\(p\)). Only increases if new features genuinely improve model performance.</p>
+      </div>
+    </div>
+
+    <h3>Behavior Comparison as Features Are Added</h3>
+    <div class="chart-container">
+      <canvas id="r2Chart"></canvas>
+    </div>
+  </div>
+
+  <!-- 7. Assumptions -->
+  <div class="section-card">
+    <h2>7. Key Assumptions of Linear Regression</h2>
+    <ol>
+      <li><span class="highlight">Linearity:</span> The target \(y\) has a linear relationship with predictor features.</li>
+      <li><span class="highlight">Homoscedasticity:</span> Variance of errors remains constant across all values of features.</li>
+      <li><span class="highlight">Independence:</span> Observations and residuals are independent of each other (no autocorrelation).</li>
+      <li><span class="highlight">Normality of Residuals:</span> Error terms follow a normal distribution centered at 0.</li>
+      <li><span class="highlight">No Multicollinearity:</span> Features are not strongly correlated with each other.</li>
+    </ol>
+  </div>
+
+  <!-- 8. Python Code Implementation (OLS & Gradient Descent) -->
+  <div class="section-card">
+    <h2>8. Complete Python Implementation (OLS & Gradient Descent)</h2>
+    <p>Below is the complete implementation of Linear Regression including both Ordinary Least Squares (OLS) closed-form calculation and iterative Gradient Descent:</p>
+
+<pre><code>import numpy as np
+
+# Sample Data
+x = np.array([1, 2, 3, 4, 5], dtype=float)
+y = np.array([2, 4, 5, 4, 5], dtype=float)
+n = len(x)
+
+# ==========================================
+# 1. ORDINARY LEAST SQUARES (OLS) METHOD
+# ==========================================
+# Formulas:
+# m = sum((x_i - mean_x) * (y_i - mean_y)) / sum((x_i - mean_x)^2)
+# b = mean_y - m * mean_x
+
+x_mean = np.mean(x)
+y_mean = np.mean(y)
+
+b1 = np.sum((x - x_mean) * (y - y_mean)) / np.sum((x - x_mean) ** 2)
+b0 = y_mean - b1 * x_mean
+
+y_pred_ols = b0 + b1 * x
+
+print("--- OLS Method Results ---")
+print("Slope (b1):", b1)
+print("Intercept (b0):", b0)
+print("Predicted values:", y_pred_ols)
+
+# ==========================================
+# 2. GRADIENT DESCENT METHOD
+# ==========================================
+# Step 1: Initialize Parameters
+m = 0.0
+b = 0.0
+
+# Hyperparameters
+learning_rate = 0.01
+epochs = 1000
+
+# Optimization Loop
+for _ in range(epochs):
+    # Step 2 & 3: Compute Predictions & Gradients
+    # dJ/dm = -2/n * sum(x * (y - (m*x + b)))
+    # dJ/db = -2/n * sum(y - (m*x + b))
+    y_pred = m * x + b
+    error = y - y_pred
+    
+    dj_dm = (-2 / n) * np.sum(x * error)
+    dj_db = (-2 / n) * np.sum(error)
+    
+    # Step 4: Update Parameters
+    m = m - (learning_rate * dj_dm)
+    b = b - (learning_rate * dj_db)
+
+y_pred_gd = m * x + b
+
+print("\n--- Gradient Descent Results ---")
+print("Slope (m):", m)
+print("Intercept (b):", b)
+print("Predicted values:", y_pred_gd)
+</code></pre>
+  </div>
+
+</div>
+
+<!-- Interactive Chart Scripts -->
+<script>
+  // 1. Loss Curves Chart (MAE vs MSE vs RMSE)
+  const ctxLoss = document.getElementById('lossChart').getContext('2d');
+  const errors = [-3, -2.5, -2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2, 2.5, 3];
+  
+  new Chart(ctxLoss, {
+    type: 'line',
+    data: {
+      labels: errors,
+      datasets: [
+        { label: 'MAE (|Error|)', data: errors.map(e => Math.abs(e)), borderColor: '#38bdf8', borderWidth: 2, fill: false },
+        { label: 'MSE (Error²)', data: errors.map(e => Math.pow(e, 2)), borderColor: '#f472b6', borderWidth: 2, fill: false },
+        { label: 'RMSE (√Error²)', data: errors.map(e => Math.sqrt(Math.pow(e, 2))), borderColor: '#4ade80', borderWidth: 2, borderDash: [5, 5], fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'Loss Penalty Curves', color: '#f8fafc' },
+        legend: { labels: { color: '#f8fafc' } }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Residual Error (y - ŷ)', color: '#94a3b8' }, ticks: { color: '#94a3b8' } },
+        y: { title: { display: true, text: 'Penalty Value', color: '#94a3b8' }, ticks: { color: '#94a3b8' } }
+      }
+    }
+  });
+
+  // 2. R2 vs Adjusted R2 Chart
+  const ctxR2 = document.getElementById('r2Chart').getContext('2d');
+  const featureCount = [1, 2, 3, 4, 5, 6, 7, 8];
+  
+  new Chart(ctxR2, {
+    type: 'line',
+    data: {
+      labels: featureCount,
+      datasets: [
+        { label: 'R² (Keeps rising artificially)', data: [0.70, 0.75, 0.78, 0.80, 0.81, 0.815, 0.82, 0.822], borderColor: '#38bdf8', borderWidth: 2, fill: false },
+        { label: 'Adjusted R² (Penalizes noise features)', data: [0.68, 0.74, 0.76, 0.77, 0.76, 0.74, 0.71, 0.68], borderColor: '#f472b6', borderWidth: 2, fill: false }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: 'Effect of Adding Useless Predictor Features', color: '#f8fafc' },
+        legend: { labels: { color: '#f8fafc' } }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Number of Features (p)', color: '#94a3b8' }, ticks: { color: '#94a3b8' } },
+        y: { title: { display: true, text: 'Score Value', color: '#94a3b8' }, ticks: { color: '#94a3b8' } }
+      }
+    }
+  });
+
+  // 3. Canvas 3D Gradient Descent Visualization
+  const canvas = document.getElementById('canvas3d');
+  const c3d = canvas.getContext('2d');
+
+  function draw3DCostSurface() {
+    c3d.clearRect(0, 0, canvas.width, canvas.height);
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2 + 20;
+
+    // Draw Paraboloid Ellipses
+    for (let r = 120; r > 10; r -= 15) {
+      c3d.beginPath();
+      c3d.ellipse(cx, cy - (r * 0.4), r * 1.5, r * 0.5, 0, 0, 2 * Math.PI);
+      c3d.strokeStyle = `rgba(56, 189, 248, ${0.15 + (120 - r) / 150})`;
+      c3d.lineWidth = 1.5;
+      c3d.stroke();
+    }
+
+    // Trajectory Path
+    const points = [
+      {x: cx + 150, y: cy - 90},
+      {x: cx + 90,  y: cy - 50},
+      {x: cx + 45,  y: cy - 25},
+      {x: cx + 20,  y: cy - 10},
+      {x: cx,       y: cy}
+    ];
+
+    c3d.beginPath();
+    c3d.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      c3d.lineTo(points[i].x, points[i].y);
+    }
+    c3d.strokeStyle = '#f472b6';
+    c3d.lineWidth = 3;
+    c3d.stroke();
+
+    // Points
+    points.forEach((p, idx) => {
+      c3d.beginPath();
+      c3d.arc(p.x, p.y, idx === points.length - 1 ? 6 : 4, 0, 2 * Math.PI);
+      c3d.fillStyle = idx === points.length - 1 ? '#4ade80' : '#fde047';
+      c3d.fill();
+    });
+
+    c3d.fillStyle = '#f8fafc';
+    c3d.font = '12px sans-serif';
+    c3d.fillText("Start Parameters (m, b)", points[0].x - 150, points[0].y);
+    c3d.fillText("Global Minimum J(m,b)", points[points.length-1].x + 15, points[points.length-1].y + 5);
+  }
+
+  draw3DCostSurface();
+</script>
+
+</body>
+</html>
